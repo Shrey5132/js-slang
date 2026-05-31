@@ -14540,7 +14540,10 @@ math_sin(1) + undefined;
 [afterMarker] math_sin runs
 
 0.8414709848078965 + undefined;
-[noMarker] Evaluation complete
+[beforeMarker] Expected number on right hand side of operation, got undefined.
+
+0.8414709848078965 + undefined;
+[noMarker] Evaluation stuck
 "
 `;
 
@@ -16412,39 +16415,6 @@ false ? 1 : 2 * h(h, 5 - 1);
 [afterMarker] Binary expression 2 * 18 evaluated
 
 36;
-[noMarker] Evaluation complete
-"
-`;
-
-exports[`triple equals work on function 1`] = `
-"function f() { return g();}function g() { return f();}f === f;g === g;f === g;
-[noMarker] Start of evaluation
-
-function f() { return g();}function g() { return f();}f === f;g === g;f === g;
-[beforeMarker] Function f declared, parameter(s)  required
-
-function g() { return f();}(f) === (f);g === g;(f) === g;
-[afterMarker] Function f declared, parameter(s)  required
-
-function g() { return f();}(f) === (f);g === g;(f) === g;
-[beforeMarker] Function g declared, parameter(s)  required
-
-(f) === (f);(g) === (g);(f) === (g);
-[afterMarker] Function g declared, parameter(s)  required
-
-(f) === (f);(g) === (g);(f) === (g);
-[beforeMarker] (f) === (f) finished evaluating
-
-(g) === (g);(f) === (g);
-[afterMarker] (f) === (f) finished evaluating
-
-(g) === (g);(f) === (g);
-[beforeMarker] (g) === (g) finished evaluating
-
-(f) === (g);
-[afterMarker] (g) === (g) finished evaluating
-
-(f) === (g);
 [noMarker] Evaluation complete
 "
 `;

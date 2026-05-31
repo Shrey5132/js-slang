@@ -720,7 +720,7 @@ describe('List operations', () => {
   });
 });
 
-test('triple equals work on function', () => {
+test('triple equals on functions should show runtime type error in Source 2', () => {
   const code = `
     function f() { return g(); } function g() { return f(); }
     f === f;
@@ -728,7 +728,12 @@ test('triple equals work on function', () => {
     f === g;
   `;
   const steps = codify(acornParser(code));
-  expect(steps.join('\n')).toMatchSnapshot();
+  // In Source 2, === is restricted to string and number operands.
+  // Using === on functions should result in a runtime type error.
+  expect(steps[steps.length - 1].includes('Evaluation stuck')).toBe(true);
+  const errorStep = steps.find((step: string) => step.includes('Expected'));
+  expect(errorStep).toBeDefined();
+  expect(errorStep).toContain('function');
 });
 
 test('Function declaration with if else block', () => {
@@ -1670,6 +1675,55 @@ describe('Test runtime errors', () => {
     const steps = codify(acornParser(code));
     expect(steps.join('\n')).toMatchSnapshot();
     expect(steps[steps.length - 1].includes('Evaluation stuck')).toBe(true);
+  });
+
+  test('Binary operation on two functions should show runtime type error (#1983)', () => {
+    const code = `
+    const f = () => 1;
+    f + f;
+    `;
+    const steps = codify(acornParser(code));
+    expect(steps[steps.length - 1].includes('Evaluation stuck')).toBe(true);
+    // Verify the error message mentions the type mismatch
+    const errorStep = steps.find((step: string) => step.includes('Expected'));
+    expect(errorStep).toBeDefined();
+    expect(errorStep).toContain('function');
+  });
+
+  test('Unary negation on a function should show runtime type error (#1983)', () => {
+    const code = `
+    const f = () => 1;
+    -f;
+    `;
+    const steps = codify(acornParser(code));
+    expect(steps[steps.length - 1].includes('Evaluation stuck')).toBe(true);
+    const errorStep = steps.find((step: string) => step.includes('Expected'));
+    expect(errorStep).toBeDefined();
+    expect(errorStep).toContain('function');
+  });
+
+  test('Boolean negation on a function should show runtime type error (#1983)', () => {
+    const code = `
+    const f = () => 1;
+    !f;
+    `;
+    const steps = codify(acornParser(code));
+    expect(steps[steps.length - 1].includes('Evaluation stuck')).toBe(true);
+    const errorStep = steps.find((step: string) => step.includes('Expected'));
+    expect(errorStep).toBeDefined();
+    expect(errorStep).toContain('function');
+  });
+
+  test('Binary operation on function and number should show runtime type error (#1983)', () => {
+    const code = `
+    const f = x => x + 1;
+    f + 1;
+    `;
+    const steps = codify(acornParser(code));
+    expect(steps[steps.length - 1].includes('Evaluation stuck')).toBe(true);
+    const errorStep = steps.find((step: string) => step.includes('Expected'));
+    expect(errorStep).toBeDefined();
+    expect(errorStep).toContain('function');
   });
 });
 
